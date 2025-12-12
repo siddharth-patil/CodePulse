@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { BlogPostService } from './../services/blog-post-service';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from "@angular/router";
 
 @Component({
@@ -8,5 +9,12 @@ import { RouterLink } from "@angular/router";
   styleUrl: './blogpost-list.css',
 })
 export class BlogpostList {
+  blogPostService = inject(BlogPostService);
 
+  getAllBlogPostRef = this.blogPostService.getAllBlogPosts();
+
+  isLoading = this.getAllBlogPostRef.isLoading;
+  error = this.getAllBlogPostRef.error;
+  response = this.getAllBlogPostRef.value;
+  statusCode = this.getAllBlogPostRef.statusCode;
 }

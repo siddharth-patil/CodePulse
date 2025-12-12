@@ -22,17 +22,31 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Content</label>
-      <textarea
-        type="text"
-        class="form-control"
-        formControlName="content"
-        rows="5"
-      ></textarea>
+      <div class="d-flex flex-row">
+        <div class="col-6 p-2">
+          <label class="form-label">Content</label>
+          <textarea
+            type="text"
+            class="form-control"
+            formControlName="content"
+            rows="5"
+          ></textarea>
+        </div>
+        <div class="col-6 p-2" style="max-height: 350px; overflow-y: scroll;">
+          <markdown [data]="addBlogPostForm.controls.content.getRawValue()"></markdown>
+        </div>
+      </div>
     </div>
 
     <div class="mb-3">
       <label class="form-label">Featured Image Url</label>
+
+      @if (addBlogPostForm.controls.featuredImageUrl.getRawValue()) {
+        <div>
+          <img class="my-2" style="width: 100px;" [src]="addBlogPostForm.controls.featuredImageUrl.getRawValue()" alt="">
+        </div>
+      }
+
       <input
         type="text"
         class="form-control"
@@ -58,14 +72,12 @@
           id="isVisible"
           formControlName="isVisible"
         />
-        <label class="form-check-label" for="isVisible">
-          Is Visible?
-        </label>
+        <label class="form-check-label" for="isVisible"> Is Visible? </label>
       </div>
     </div>
 
     <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary">Save</button>
     </div>
   </form>
 </div>
