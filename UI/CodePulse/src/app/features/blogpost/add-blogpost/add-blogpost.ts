@@ -4,6 +4,7 @@ import { BlogPostService } from '../services/blog-post-service';
 import { AddBlogPostRequest } from '../models/blogpost.model';
 import { Router } from '@angular/router';
 import { MarkdownComponent } from 'ngx-markdown';
+import { CateoryService } from '../../category/services/cateory-service';
 
 @Component({
   selector: 'app-add-blogpost',
@@ -14,7 +15,10 @@ import { MarkdownComponent } from 'ngx-markdown';
 export class AddBlogpost {
 
   blogPostService = inject(BlogPostService);
+  categoryService = inject(CateoryService);
   router = inject(Router);
+  private categoriesResourceRef = this.categoryService.getAllCategories();
+  categoriesResponse = this.categoriesResourceRef.value;
 
   addBlogPostForm = new FormGroup({
     title: new FormControl<string>('', {
@@ -49,11 +53,15 @@ export class AddBlogpost {
       nonNullable: true,
       validators: [Validators.required]
     }),
+    categories: new FormControl<string[]>([]),
   });
 
   onSubmit(){
 
     const formRawValue = this.addBlogPostForm.getRawValue();
+
+    console.log(formRawValue);
+    
 
     const requestDto: AddBlogPostRequest = {
       title: formRawValue.title,
@@ -63,7 +71,8 @@ export class AddBlogpost {
       isVisible: formRawValue.isVisible,
       urlHandle: formRawValue.urlHandle,
       author: formRawValue.author,
-      publishedDate: new Date(formRawValue.publishedDate)
+      publishedDate: new Date(formRawValue.publishedDate),
+      categories: formRawValue.categories ?? [],
     }
 
     this.blogPostService.createBlogPost(requestDto).subscribe({
@@ -75,7 +84,7 @@ export class AddBlogpost {
         
       },
       error: () => {
-        console.error('SOmething went wrong');
+        console.error('Something went wrong');
         
       }
     });    
