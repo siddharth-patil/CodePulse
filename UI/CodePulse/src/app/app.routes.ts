@@ -4,6 +4,7 @@ import { AddCategory } from './features/category/add-category/add-category';
 import { EditCategory } from './features/category/edit-category/edit-category';
 import { BlogpostList } from './features/blogpost/blogpost-list/blogpost-list';
 import { AddBlogpost } from './features/blogpost/add-blogpost/add-blogpost';
+import { EditBlogpost } from './features/blogpost/edit-blogpost/edit-blogpost';
 
 export const routes: Routes = [
     {path:'admin/categories', component: CategoryList},
@@ -12,4 +13,5 @@ export const routes: Routes = [
     // {path:'admin/categories/add', component: AddCategory},
     {path:'admin/blogposts', component: BlogpostList},
     {path:'admin/blogposts/add', component: AddBlogpost},
+    {path:'admin/blogposts/edit/:id', component: EditBlogpost},
 ];
