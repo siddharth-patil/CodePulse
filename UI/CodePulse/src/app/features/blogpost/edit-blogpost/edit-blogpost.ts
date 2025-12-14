@@ -10,10 +10,12 @@ import { MarkdownComponent } from 'ngx-markdown';
 import { CateoryService } from '../../category/services/cateory-service';
 import { UpdateBlogPostRequest } from '../models/blogpost.model';
 import { Router } from '@angular/router';
+import { ImageSelector } from '../../../shared/components/image-selector/image-selector';
+import { ImageSelectorService } from '../../../shared/services/image-selector-service';
 
 @Component({
   selector: 'app-edit-blogpost',
-  imports: [ReactiveFormsModule, MarkdownComponent],
+  imports: [ReactiveFormsModule, MarkdownComponent, ImageSelector],
   templateUrl: './edit-blogpost.html',
   styleUrl: './edit-blogpost.css',
 })
@@ -23,6 +25,7 @@ export class EditBlogpost {
   private blogPostRef = this.blogPostService.getBlogPostById(this.id);
   blogPostResponse = this.blogPostRef.value;
   categoryService = inject(CateoryService);
+  imageSelectorService = inject(ImageSelectorService);
   router = inject(Router);
 
   private categoriesRef = this.categoryService.getAllCategories();
@@ -93,6 +96,15 @@ export class EditBlogpost {
     }
   });
 
+  selectedImageEffectRef = effect(()=>{
+    const selectedImageUrl = this.imageSelectorService.selectedImage();
+    if(selectedImageUrl){
+      this.editBlogPostForm.patchValue({
+        featuredImageUrl: selectedImageUrl,
+      })
+    }
+  });
+
   onSubmit() {
     const id = this.id();
     // if (id && this.editBlogPostForm.valid)
@@ -137,5 +149,9 @@ export class EditBlogpost {
         }
       });
     }
+  }
+
+  openImageSelector(){
+    this.imageSelectorService.displayImageSelector();
   }
 }
