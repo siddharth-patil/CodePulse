@@ -82,7 +82,9 @@ app.UseCors(options =>
 {
     options.AllowAnyHeader();
     options.AllowAnyMethod();
-    options.AllowAnyOrigin();
+    //options.AllowAnyOrigin();
+    options.WithOrigins("http://localhost:4200");
+    options.AllowCredentials();
 });
 
 app.UseAuthentication();
