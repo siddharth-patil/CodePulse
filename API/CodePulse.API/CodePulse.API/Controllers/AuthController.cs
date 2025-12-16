@@ -1,9 +1,11 @@
 ﻿using CodePulse.API.Models.DTO;
 using CodePulse.API.Repositories.Implementation;
 using CodePulse.API.Repositories.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CodePulse.API.Controllers
 {
@@ -67,8 +69,6 @@ namespace CodePulse.API.Controllers
         }
 
 
-
-
         //POST: api/auth/register
         [HttpPost]
         [Route("register")]
@@ -118,6 +118,44 @@ namespace CodePulse.API.Controllers
             }
 
             return ValidationProblem(ModelState);
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("me")]
+        //GET: api/auth/me
+        public IActionResult UserDetails()
+        {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            var response = new LoginResponseDto
+            {
+                Email = User.FindFirst(ClaimTypes.Email)?.Value,
+                Roles = User.FindAll(ClaimTypes.Role).Select(x=>x.Value).ToList()
+            };
+
+            return Ok(response);
+        }
+
+
+        [HttpPost]
+        [Route("logout")]
+        public IActionResult Logout()
+        {
+            //Overwrite the previous cookie
+            Response.Cookies.Append("access_token", "", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(-1)
+            });
+
+            return Ok();
         }
     }
 }

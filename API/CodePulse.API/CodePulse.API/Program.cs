@@ -64,6 +64,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.TryGetValue("access_token", out var token))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 
@@ -83,7 +95,7 @@ app.UseCors(options =>
     options.AllowAnyHeader();
     options.AllowAnyMethod();
     //options.AllowAnyOrigin();
-    options.WithOrigins("http://localhost:4200");
+    options.WithOrigins("https://localhost:4200");
     options.AllowCredentials();
 });
 
