@@ -1,7 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { LoginResponse, User } from '../models/auth.model';
-import { HttpClient, httpResource, HttpResourceRef, HttpResourceRequest } from '@angular/common/http';
+import {
+  HttpClient,
+  httpResource,
+  HttpResourceRef,
+  HttpResourceRequest,
+} from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -13,47 +18,63 @@ export class AuthService {
   router = inject(Router);
   user = signal<User | null>(null);
 
-
-  loadUser(): HttpResourceRef<User | undefined>{
-    return httpResource<User>(()=>{
+  loadUser(): HttpResourceRef<User | undefined> {
+    return httpResource<User>(() => {
       const request: HttpResourceRequest = {
         url: `${environment.apiBaseUrl}/api/auth/me`,
-        withCredentials: true
-      }
+        withCredentials: true,
+      };
 
       return request;
     });
   }
 
-
-  login(email: string, password: string): Observable<LoginResponse>{
-    return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/api/auth/login`,{
-      email: email,
-      password: password
-    }, {
-      withCredentials: true
-    }).pipe(
-      tap((userResponse)=>this.user.set(userResponse))
-    )
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${environment.apiBaseUrl}/api/auth/login`,
+        {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .pipe(tap((userResponse) => this.setUser(userResponse)));
   }
 
-  logout(){
+  logout() {
     // API auth/logout
 
-    this.http.post<void>(`${environment.apiBaseUrl}/api/auth/logout`,{},{
-      withCredentials:true
-    }).subscribe({
-      next: ()=>{
-        //clear out the user signal
-        this.user.set(null);
-        
-        //redirect user to home page
-        this.router.navigate(['']);
-      },
-      error:()=>{
+    this.http
+      .post<void>(
+        `${environment.apiBaseUrl}/api/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      )
+      .subscribe({
+        next: () => {
+          //clear out the user signal
+          this.setUser(null);
 
-      }
-    })
+          //redirect user to home page
+          this.router.navigate(['']);
+        },
+        error: () => {},
+      });
+  }
 
+  setUser(updatedUser: User | null) {
+    if (updatedUser) {
+      this.user.set({
+        email: updatedUser.email,
+        roles: updatedUser.roles.map((r) => r.toLowerCase()),
+      });
+    }else{
+      this.user.set(null);
+    }
   }
 }
